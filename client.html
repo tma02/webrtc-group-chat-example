@@ -20,7 +20,7 @@
         <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
         <script>
             /** CONFIG **/
-            var SIGNALING_SERVER = "http://localhost";
+            var SIGNALING_SERVER = "https://omega-surf-prototype.herokuapp.com";
             var USE_AUDIO = true;
             var USE_VIDEO = true;
             var DEFAULT_CHANNEL = 'some-global-channel-name';
@@ -257,24 +257,45 @@
                     element.srcObject = stream;
                  };
 
-                navigator.getUserMedia({"audio":USE_AUDIO, "video":USE_VIDEO},
-                    function(stream) { /* user accepted access to a/v */
+                 var displayMediaOptions = {
+                   video: {
+                     cursor: "always"
+                   },
+                   audio: true
+                 };
+
+                 navigator.mediaDevices.getDisplayMedia(displayMediaOptions)
+                 .then((stream) => {
+                    console.log("Access granted to audio/video");
+                    local_media_stream = stream;
+                    var local_media = USE_VIDEO ? $("<video>") : $("<audio>");
+                    local_media.attr("autoplay", "autoplay");
+                    local_media.attr("muted", "true"); 
+                    local_media.attr("controls", "");
+                    $('body').append(local_media);
+                    attachMediaStream(local_media[0], stream);
+
+                    if (callback) callback();
+                 });
+
+                /*navigator.getUserMedia({"audio":USE_AUDIO, "video":USE_VIDEO},
+                    function(stream) {
                         console.log("Access granted to audio/video");
                         local_media_stream = stream;
                         var local_media = USE_VIDEO ? $("<video>") : $("<audio>");
                         local_media.attr("autoplay", "autoplay");
-                        local_media.attr("muted", "true"); /* always mute ourselves by default */
+                        local_media.attr("muted", "true"); 
                         local_media.attr("controls", "");
                         $('body').append(local_media);
                         attachMediaStream(local_media[0], stream);
 
                         if (callback) callback();
                     },
-                    function() { /* user denied access to a/v */
+                    function() { 
                         console.log("Access denied for audio/video");
                         alert("You chose not to provide access to the camera/microphone, demo will not work.");
                         if (errorback) errorback();
-                    });
+                    });*/
             }
         </script>
     </head>
